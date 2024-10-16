@@ -1,0 +1,177 @@
+{% extends 'quizteachers/base.html' %}
+
+{% block content %}
+<h1>Create a New Quiz</h1>
+
+<form method="POST" id="quiz-form">
+    {% csrf_token %}
+
+    <fieldset>
+        <legend>Quiz Information</legend>
+        <div class="form-group">
+            {{ quiz_form.teacher.label_tag }} {{ quiz_form.teacher }}
+        </div>
+        <div class="form-group">
+            {{ quiz_form.year.label_tag }} {{ quiz_form.year }}
+        </div>
+        <div class="form-group">
+            {{ quiz_form.title.label_tag }} {{ quiz_form.title }}
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Questions</legend>
+        
+        {{ question_formset.management_form }} <!-- This ensures the TOTAL_FORMS and other management forms are included -->
+
+        <div id="questions-container">
+            {% for form in question_formset %}
+            <div class="question-block" data-index="{{ forloop.counter0 }}">
+                <h3>Question {{ forloop.counter }}</h3>
+                <div class="form-group">
+                    {{ form.question_type.label_tag }} {{ form.question_type }}
+                </div>
+                <div class="form-group">
+                    {{ form.question_text.label_tag }} {{ form.question_text }}
+                </div>
+                <div class="mcq-options" style="display: none;">
+                    <div class="form-group">
+                        <label for="{{ form.option_1.id_for_label }}">Option 1:</label>
+                        <input type="text" name="{{ form.option_1.name }}" id="{{ form.option_1.id_for_label }}" value="{{ form.option_1.value }}" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.option_2.id_for_label }}">Option 2:</label>
+                        <input type="text" name="{{ form.option_2.name }}" id="{{ form.option_2.id_for_label }}" value="{{ form.option_2.value }}" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.option_3.id_for_label }}">Option 3:</label>
+                        <input type="text" name="{{ form.option_3.name }}" id="{{ form.option_3.id_for_label }}" value="{{ form.option_3.value }}" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.option_4.id_for_label }}">Option 4:</label>
+                        <input type="text" name="{{ form.option_4.name }}" id="{{ form.option_4.id_for_label }}" value="{{ form.option_4.value }}" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.correct_option.id_for_label }}">Correct Option:</label>
+                        <select name="{{ form.correct_option.name }}" id="{{ form.correct_option.id_for_label }}" class="form-select">
+                            <option value="1" {% if form.correct_option.value == "1" %}selected{% endif %}>Option 1</option>
+                            <option value="2" {% if form.correct_option.value == "2" %}selected{% endif %}>Option 2</option>
+                            <option value="3" {% if form.correct_option.value == "3" %}selected{% endif %}>Option 3</option>
+                            <option value="4" {% if form.correct_option.value == "4" %}selected{% endif %}>Option 4</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="text-answer" style="display: none;">
+                    <div class="form-group">
+                        <label for="{{ form.text_answer.id_for_label }}">Text Answer:</label>
+                        <input type="text" name="{{ form.text_answer.name }}" id="{{ form.text_answer.id_for_label }}" value="{{ form.text_answer.value }}" class="form-control" />
+                    </div>
+                </div>
+                
+            </div>
+            {% endfor %}
+        </div>
+    </fieldset>
+
+    <button type="button" id="add-more-questions">Add More Questions</button>
+    <button type="submit">Create Quiz</button>
+</form>
+
+<!-- Template for dynamically adding new questions -->
+<div id="empty-form-template" style="display: none;">
+    <div class="question-block" data-index="__prefix__">
+        <h3>Question __prefix__</h3>
+        <div class="form-group">
+            <label for="id_question_formset-__prefix__-question_type">Question Type:</label>
+            <select name="question_formset-__prefix__-question_type" id="id_question_formset-__prefix__-question_type">
+                <option value="TEXT">Text Question</option>
+                <option value="MCQ">Multiple Choice Question</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="id_question_formset-__prefix__-question_text">Question Text:</label>
+            <input type="text" name="question_formset-__prefix__-question_text" id="id_question_formset-__prefix__-question_text">
+        </div>
+
+        <div class="mcq-options" style="display: none;">
+            <div class="form-group">
+                <label for="id_question_formset-__prefix__-option_1">Option 1:</label>
+                <input type="text" name="question_formset-__prefix__-option_1" id="id_question_formset-__prefix__-option_1">
+            </div>
+            <div class="form-group">
+                <label for="id_question_formset-__prefix__-option_2">Option 2:</label>
+                <input type="text" name="question_formset-__prefix__-option_2" id="id_question_formset-__prefix__-option_2">
+            </div>
+            <div class="form-group">
+                <label for="id_question_formset-__prefix__-option_3">Option 3:</label>
+                <input type="text" name="question_formset-__prefix__-option_3" id="id_question_formset-__prefix__-option_3">
+            </div>
+            <div class="form-group">
+                <label for="id_question_formset-__prefix__-option_4">Option 4:</label>
+                <input type="text" name="question_formset-__prefix__-option_4" id="id_question_formset-__prefix__-option_4">
+            </div>
+            <div class="form-group">
+                <label for="id_question_formset-__prefix__-correct_option">Correct Option:</label>
+                <select name="question_formset-__prefix__-correct_option" id="id_question_formset-__prefix__-correct_option">
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                    <option value="4">Option 4</option>
+                </select>
+            </div>
+        </div>
+        <div class="text-answer" style="display: none;">
+            <div class="form-group">
+                <label for="id_question_formset-__prefix__-text_answer">Text Answer:</label>
+                <input type="text" name="question_formset-__prefix__-text_answer" id="id_question_formset-__prefix__-text_answer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function updateQuestionVisibility() {
+            document.querySelectorAll('.question-block').forEach(function(block) {
+                const questionType = block.querySelector('select[name$="-question_type"]').value;
+                const mcqOptions = block.querySelector('.mcq-options');
+                const textAnswer = block.querySelector('.text-answer');
+
+                if (questionType === 'MCQ') {
+                    mcqOptions.style.display = 'block';
+                    textAnswer.style.display = 'none';
+                } else {
+                    mcqOptions.style.display = 'none';
+                    textAnswer.style.display = 'block';
+                }
+            });
+        }
+
+        document.getElementById('questions-container').addEventListener('change', function(event) {
+            if (event.target.matches('select[name$="-question_type"]')) {
+                updateQuestionVisibility();
+            }
+        });
+
+        document.getElementById('add-more-questions').addEventListener('click', function() {
+            const totalForms = document.querySelector('#id_question_formset-TOTAL_FORMS');
+            
+            if (!totalForms) {
+                console.error('Total forms input not found! Ensure {{ question_formset.management_form }} is rendered in the template.');
+                return;
+            }
+
+            const currentIndex = parseInt(totalForms.value);
+            const newFormHtml = document.getElementById('empty-form-template').innerHTML.replace(/__prefix__/g, currentIndex);
+
+            document.getElementById('questions-container').insertAdjacentHTML('beforeend', newFormHtml);
+            totalForms.value = currentIndex + 1;
+            updateQuestionVisibility();
+        });
+
+        updateQuestionVisibility();
+    });
+</script>
+
+{% endblock %}

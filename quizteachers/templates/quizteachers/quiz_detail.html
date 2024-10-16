@@ -1,0 +1,51 @@
+{% extends 'quizteachers/base.html' %}
+{% block content %}
+    <h1>Quiz Details</h1>
+
+    <a href="{% url 'quiz_list' %}" class="back-to-list-btn">Back to Quiz List</a>
+
+    <h2>Quiz ID: {{ quiz.id }}</h2>
+    <p>Teacher: {{ quiz.teacher.name }}</p>
+    <p>Year: {{ quiz.year }}</p>
+
+    <h3>Questions:</h3>
+    <ul>
+        {% for question in quiz.questions.all %}
+            <li>
+                <strong>{{ question.question_text }}</strong> (Type: {{ question.question_type }})
+                {% if question.question_type == 'TEXT' %}
+                    <ul>
+                        {% if question.question_text_ref.exists %}
+                            {% for text in question.question_text_ref.all %}
+                                <li>Answer: {{ text.answer }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li>No answers available.</li>
+                        {% endif %}
+                    </ul>
+                {% elif question.question_type == 'MCQ' %}
+                    <ul>
+                        {% if question.question_mcq_ref.exists %}
+                            {% for mcq in question.question_mcq_ref.all %}
+                                <li>
+                                    <strong>Options:</strong>
+                                    <ul>
+                                        <li>1: {{ mcq.option_1 }}</li>
+                                        <li>2: {{ mcq.option_2 }}</li>
+                                        <li>3: {{ mcq.option_3 }}</li>
+                                        <li>4: {{ mcq.option_4 }}</li>
+                                    </ul>
+                                    <strong>Correct Option:</strong> {{ mcq.get_correct_option_display }}
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li>No MCQ options available.</li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No questions available.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
